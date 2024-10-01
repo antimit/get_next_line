@@ -6,7 +6,7 @@
 /*   By: antimit <antimit@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/01 23:02:33 by antimit           #+#    #+#             */
-/*   Updated: 2024/10/01 23:04:16 by antimit          ###   ########.fr       */
+/*   Updated: 2024/10/01 23:14:31 by antimit          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,7 +33,6 @@ void				add_buf(t_list **list, char *buf);
 void				dealloc(t_list **list, t_list *clean_node);
 void				polish_list(t_list **list);
 char				*get_next_line(int fd);
-t_list				*find_last_node(t_list *list);
 int					len_str_list(t_list *list);
 void				create_list(t_list **list, int fd);
 int					found_newline(t_list *list);
