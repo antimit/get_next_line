@@ -1,3 +1,15 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   get_next_line.h                                    :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: antimit <antimit@student.42.fr>            +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2024/10/01 23:02:33 by antimit           #+#    #+#             */
+/*   Updated: 2024/10/01 23:04:16 by antimit          ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #ifndef GET_NEXT_LINE_H
 # define GET_NEXT_LINE_H
 
@@ -25,5 +37,6 @@ t_list				*find_last_node(t_list *list);
 int					len_str_list(t_list *list);
 void				create_list(t_list **list, int fd);
 int					found_newline(t_list *list);
+char				*parse_list(t_list *list, char *result);
 
 #endif

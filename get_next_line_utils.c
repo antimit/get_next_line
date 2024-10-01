@@ -1,25 +1,36 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   get_next_line_utils.c                              :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: antimit <antimit@student.42.fr>            +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2024/10/01 23:02:18 by antimit           #+#    #+#             */
+/*   Updated: 2024/10/01 23:13:33 by antimit          ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "get_next_line.h"
 
-t_list	*find_last_node(t_list *list)
-{
-	if (NULL == list)
-		return (NULL);
-	while (list->next)
-		list = list->next;
-	return (list);
-}
 void	polish_list(t_list **list)
 {
-	t_list	*last_node, *clean_node;
 	char	*buf;
-	int		i = 0, k = 0;
+	int		i;
+	int		k;
+	t_list	*last_node;
+	t_list	*clean_node;
 
-	if (!*list || !(last_node = find_last_node(*list)))
-		return;
+	i = 0;
+	k = 0;
+	last_node = *list;
+	if (!*list)
+		return ;
+	while (last_node->next)
+		last_node = last_node->next;
 	buf = malloc(BUFFER_SIZE + 1);
 	clean_node = malloc(sizeof(t_list));
 	if (!buf || !clean_node)
-		return;
+		return ;
 	while (last_node->buf[i] && last_node->buf[i] != '\n')
 		i++;
 	while (last_node->buf[i] && last_node->buf[++i])
@@ -29,7 +40,6 @@ void	polish_list(t_list **list)
 	clean_node->next = NULL;
 	dealloc(list, clean_node);
 }
-
 
 void	dealloc(t_list **list, t_list *clean_node)
 {
@@ -51,37 +61,12 @@ void	dealloc(t_list **list, t_list *clean_node)
 	}
 }
 
-
-// int	len_str_list(t_list *list)
-// {
-// 	int len;
-// 	int i;
-
-// 	len = 0;
-// 	while (list)
-// 	{
-// 		if (list->buf)
-// 		{
-// 			i = 0;
-// 			while (list->buf[i])
-// 			{
-// 				if (list->buf[i] == '\n')
-// 				{
-// 					len += i + 1;
-// 					return (len);
-// 				}
-// 				i++;
-// 			}
-// 			len += i;
-// 		}
-// 		list = list->next;
-// 	}
-// 	return (len);
-// }
 int	len_str_list(t_list *list)
 {
-	int len = 0, i;
+	int	len;
+	int	i;
 
+	len = 0;
 	while (list)
 	{
 		i = 0;
@@ -95,4 +80,51 @@ int	len_str_list(t_list *list)
 		list = list->next;
 	}
 	return (len);
+}
+
+char	*parse_list(t_list *list, char *result)
+{
+	int	i;
+	int	j;
+
+	j = 0;
+	while (list)
+	{
+		i = 0;
+		while (list->buf[i])
+		{
+			result[j] = list->buf[i];
+			if (list->buf[i] == '\n')
+			{
+				result[++j] = '\0';
+				return (result);
+			}
+			i++;
+			j++;
+		}
+		list = list->next;
+	}
+	result[j] = '\0';
+	return (result);
+}
+
+void	add_buf(t_list **list, char *buf)
+{
+	t_list	*new_node;
+	t_list	*temp;
+
+	new_node = (t_list *)malloc(sizeof(t_list));
+	if (!new_node)
+		return ;
+	new_node->buf = buf;
+	new_node->next = NULL;
+	if (*list == NULL)
+		*list = new_node;
+	else
+	{
+		temp = *list;
+		while (temp->next)
+			temp = temp->next;
+		temp->next = new_node;
+	}
 }
