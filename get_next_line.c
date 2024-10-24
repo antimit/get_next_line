@@ -1,98 +1,139 @@
-/* ************************************************************************** */
-/*                                                                            */
-/*                                                        :::      ::::::::   */
-/*   get_next_line.c                                    :+:      :+:    :+:   */
-/*                                                    +:+ +:+         +:+     */
-/*   By: onosul <onosul@student.42.fr>              +#+  +:+       +#+        */
-/*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2024/10/02 17:04:23 by onosul            #+#    #+#             */
-/*   Updated: 2024/10/02 17:04:32 by onosul           ###   ########.fr       */
-/*                                                                            */
-/* ************************************************************************** */
-
 #include "get_next_line.h"
 
-char	*get_new_line(t_list *list)
-{
-	char	*result;
 
-	if (list == NULL)
+
+char *get_new_line(int fd, char *buffer)
+{
+    char *line;
+    int char_read;
+
+    line = (char *)malloc(BUFFER_SIZE + 1);
+    if (!line)
+        return NULL;
+
+    char_read = 1;
+    while (!newline(buffer) && char_read > 0)
+    {
+        char_read = read(fd, line, BUFFER_SIZE);
+        if (char_read == -1) // Error in reading
+        {
+            free(line);
+            free(buffer);   // Clear the buffer on read error
+            buffer = NULL;  // Reset buffer
+            return NULL;
+        }
+        line[char_read] = '\0';
+        buffer = append_string(buffer, line);
+    }
+    free(line);
+    return buffer;
+}
+
+
+char	*after_new_line(char *left_str)
+{
+	int		i;
+	int		j;
+	char	*str;
+
+	i = 0;
+	while (left_str[i] && left_str[i] != '\n')
+		i++;
+	if (!left_str[i])
+	{
+		free(left_str);
 		return (NULL);
-	result = (char *)malloc(len_str_list(list) + 1);
-	if (!result)
+	}
+	str = (char *)malloc(sizeof(char) * (str_len(left_str) - i + 1));
+	if (!str)
 		return (NULL);
-	return (parse_list(list, result));
+	i++;
+	j = 0;
+	while (left_str[i])
+		str[j++] = left_str[i++];
+	str[j] = '\0';
+	free(left_str);
+	return (str);
 }
 
-int	found_newline(t_list *list)
+
+char	*before_new_line(char *left_str)
 {
-	int	i;
+	int		i;
+	char	*str;
 
-	while (list)
+	i = 0;
+	if (!left_str[i])
+		return (NULL);
+	while (left_str[i] && left_str[i] != '\n')
+		i++;
+	str = (char *)malloc(sizeof(char) * (i + 2));
+	if (!str)
+		return (NULL);
+	i = 0;
+	while (left_str[i] && left_str[i] != '\n')
 	{
-		i = 0;
-		while (list->buf[i] && i < BUFFER_SIZE)
-		{
-			if (list->buf[i] == '\n')
-				return (1);
-			i++;
-		}
-		list = list->next;
+		str[i] = left_str[i];
+		i++;
 	}
-	return (0);
-}
-
-void	clear_list(t_list **list)
-{
-	t_list	*temp;
-
-	while (*list)
+	if (left_str[i] == '\n')
 	{
-		temp = (*list)->next;
-		free((*list)->buf);
-		free(*list);
-		*list = temp;
+		str[i] = left_str[i];
+		i++;
 	}
-}
-
-void	create_list(t_list **list, int fd)
-{
-	char	*buf;
-	int		char_read;
-
-	while (!found_newline(*list))
-	{
-		buf = (char *)malloc(BUFFER_SIZE + 1);
-		if (!buf)
-			return ;
-		char_read = read(fd, buf, BUFFER_SIZE);
-		if (char_read < 0)
-		{
-			free(buf);
-			clear_list(list);
-			return ;
-		}
-		if (char_read == 0)
-		{
-			free(buf);
-			return ;
-		}
-		buf[char_read] = '\0';
-		add_buf(list, buf);
-	}
+	str[i] = '\0';
+	return (str);
 }
 
 char	*get_next_line(int fd)
 {
-	static t_list	*list = NULL;
-	char			*result;
+	char	*line;
+	static  char * buffer;
 
 	if (fd < 0 || BUFFER_SIZE <= 0)
+	{
 		return (NULL);
-	create_list(&list, fd);
-	if (!list)
-		return (NULL);
-	result = get_new_line(list);
-	polish_list(&list);
-	return (result);
+	}
+	buffer = get_new_line(fd,buffer);
+	if(!buffer)
+		return NULL;
+	line = before_new_line(buffer);
+	buffer = after_new_line(buffer);
+	return (line);
 }
+
+int	main(void)
+{
+	int		fd;
+	char	*result;
+	// char	*result1;
+	// char	*result2;
+
+	// fd = open("sample.txt", O_RDWR | O_CREAT | O_TRUNC, 0644);
+    fd = open("sample.txt", O_RDWR );
+	// write(fd, "Hello\nWorld\nWorld", 17);
+	// lseek(fd, 0, SEEK_SET);
+	// while(get_next_line(fd)!=NULL)
+	// {
+	// 	result = get_next_line(fd);
+	// 	printf("%s",result);
+	// }
+	// result = get_next_line(fd);
+	// printf("%s\n",result);
+	result = get_next_line(fd);
+	// result1 = get_next_line(fd);
+	// result2 = get_next_line(fd);
+	if(result)
+	{
+
+	}
+	// ft_printf("%s", result);
+	// ft_printf("%s", result1);
+	// printf("%s",result2);
+	close(fd);
+	// printf("%s", result);
+	return (0);
+}
+
+
+

@@ -1,130 +1,65 @@
-/* ************************************************************************** */
-/*                                                                            */
-/*                                                        :::      ::::::::   */
-/*   get_next_line_utils.c                              :+:      :+:    :+:   */
-/*                                                    +:+ +:+         +:+     */
-/*   By: onosul <onosul@student.42.fr>              +#+  +:+       +#+        */
-/*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2024/10/02 17:04:16 by onosul            #+#    #+#             */
-/*   Updated: 2024/10/02 17:04:34 by onosul           ###   ########.fr       */
-/*                                                                            */
-/* ************************************************************************** */
-
 #include "get_next_line.h"
 
-void	polish_list(t_list **list)
+char	*append_string(char *left_str, char *buff)
 {
-	char	*buf;
-	int		i;
-	int		k;
-	t_list	*last_node;
-	t_list	*clean_node;
+	size_t	i;
+	size_t	j;
+	char	*str;
 
-	i = 0;
-	k = 0;
-	last_node = *list;
-	if (!*list)
-		return ;
-	while (last_node->next)
-		last_node = last_node->next;
-	buf = malloc(BUFFER_SIZE + 1);
-	clean_node = malloc(sizeof(t_list));
-	if (!buf || !clean_node)
-		return ;
-	while (last_node->buf[i] && last_node->buf[i] != '\n')
-		i++;
-	while (last_node->buf[i] && last_node->buf[++i])
-		buf[k++] = last_node->buf[i];
-	buf[k] = '\0';
-	clean_node->buf = buf;
-	clean_node->next = NULL;
-	dealloc(list, clean_node);
-}
-
-void	dealloc(t_list **list, t_list *clean_node)
-{
-	t_list	*tmp;
-
-	while (*list)
+	if (!left_str)
 	{
-		tmp = (*list)->next;
-		free((*list)->buf);
-		free(*list);
-		*list = tmp;
+		left_str = (char *)malloc(1 * sizeof(char));
+		left_str[0] = '\0';
 	}
-	if (clean_node->buf[0])
-		*list = clean_node;
-	else
-	{
-		free(clean_node->buf);
-		free(clean_node);
-	}
-}
-
-int	len_str_list(t_list *list)
-{
-	int	len;
-	int	i;
-
-	len = 0;
-	while (list)
-	{
-		i = 0;
-		while (list->buf[i])
-		{
-			if (list->buf[i] == '\n')
-				return (len + i + 1);
-			i++;
-		}
-		len += i;
-		list = list->next;
-	}
-	return (len);
-}
-
-char	*parse_list(t_list *list, char *result)
-{
-	int	i;
-	int	j;
-
+	if (!left_str || !buff)
+		return (NULL);
+	str = malloc(sizeof(char) * ((str_len(left_str) + str_len(buff)) + 1));
+	if (str == NULL)
+		return (NULL);
+	i = -1;
 	j = 0;
-	while (list)
-	{
-		i = 0;
-		while (list->buf[i])
-		{
-			result[j] = list->buf[i];
-			if (list->buf[i] == '\n')
-			{
-				result[++j] = '\0';
-				return (result);
-			}
-			i++;
-			j++;
-		}
-		list = list->next;
-	}
-	result[j] = '\0';
-	return (result);
+	if (left_str)
+		while (left_str[++i] != '\0')
+			str[i] = left_str[i];
+	while (buff[j] != '\0')
+		str[i++] = buff[j++];
+	str[str_len(left_str) + str_len(buff)] = '\0';
+	free(left_str);
+	return (str);
 }
 
-void	add_buf(t_list **list, char *buf)
+
+int	str_len(char *str)
 {
-	t_list	*new_node;
-	t_list	*temp;
+	int	i;
 
-	new_node = (t_list *)malloc(sizeof(t_list));
-	if (!new_node)
-		return ;
-	new_node->buf = buf;
-	new_node->next = NULL;
-	if (*list == NULL)
-		*list = new_node;
-	else
+	if (!str)
 	{
-		temp = *list;
-		while (temp->next)
-			temp = temp->next;
-		temp->next = new_node;
+		return (0);
 	}
+	i = 0;
+	while (str[i])
+	{
+		i++;
+	}
+	return (i);
 }
+
+int	newline(char *str)
+{
+	int	i;
+
+	if (!str)
+	{
+		return (0);
+	}
+	i = 0;
+	while (str[i])
+	{
+		if (str[i] == '\n')
+			return (1);
+		i++;
+	}
+	return (0);
+}
+
